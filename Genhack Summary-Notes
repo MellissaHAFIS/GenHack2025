@@ -1,0 +1,111 @@
+# GenHack 2025 – Project Summary
+
+## 🧠 Project Idea / Subject
+
+### Insights from Charles‑Albert Lehalle (Organizer Talk)
+
+During the meeting, the organizer explained the **core motivation** behind the hackathon challenge:
+
+* ERA5 temperatures are **rescaled/reconstructed** using physical atmospheric models and **infrared data**.
+* These reconstructions rely partly on **true temperature observations**, but the final product still contains **systematic errors**.
+* Errors tend to be larger in **cities**, **mountain areas**, or **complex terrain** where urban structures or altitude make physical modeling harder.
+* To assess the **quality** of ERA5 rescaled temperatures, we must compare them to **ground‑truth station data**.
+* To understand how **urbanism** impacts temperature accuracy, we use **NDVI (biomass)** maps from satellite imagery.
+* Hypothesis:
+  **ERA5 temperature is more accurate in areas with vegetation (high biomass) and less accurate in dense urban zones (low biomass) due to the Urban Heat Island effect.**
+* Our mission is to verify this relationship by turning the data into meaningful **plots, metrics, and maps**.
+
+This forms the conceptual foundation for the entire hackathon.
+GenHack 2025 is an international hackathon focused on understanding and modeling the **Urban Heat Island (UHI)** effect across Europe using satellite and climate data.
+
+The goal is to:
+
+* Compare **ERA5** rescaled temperature data with **ground‑station observations**.
+* Study how **vegetation (NDVI)** affects temperature discrepancies.
+* Build visualizations, metrics, and simple explanatory models.
+* Provide insights that can help cities better understand and mitigate UHI.
+
+---
+
+## 📅 Week 1 Thursday, November 13 → Monday, November 17  – What We Have to Do
+
+This week is the **Exploration & Warm‑up phase**.
+Focus: explore the provided data sources (ERA5, NDVI, and ground stations).
+Our objectives:
+
+### 1. **Load and inspect the datasets**
+
+* Understand the variables, formats, sizes, and spatial/temporal coverage.
+* Use the provided notebooks to learn how to open ERA5 NetCDF.
+
+### 2. **Produce first simple visualizations**
+
+* Map ERA5 daily max temperature.
+* Map NDVI.
+* Plot a few ground‑station temperature series.
+
+### 3. **Perform basic comparisons**
+
+* Pick a small region or sample of stations.
+* Compare rescaled ERA5 temperature vs ground truth.
+* Look for basic biases (systematic over/under‑estimation).
+
+### 4. **Prepare a small slide deck**
+
+* Objective of the week: show that we understand the data.
+* Include 3–5 clean figures.
+* Add observations, challenges, and ideas for next weeks.
+
+**Deliverable due: Monday, November 17 at 12:00 (noon).**
+ 
+---
+
+## 📦 Datasets Provided
+https://drive.google.com/drive/folders/1peXqRQL4qCKhb1ldDYEjcM_I1gxXAJ0V?usp=drive_link 
+Below is a summary of all available datasets and what they contain.
+
+### **1. ERA5-Land Daily Statistics** (folder: `derived-era5-land-daily-statistics`)
+
+* Temperature max, precipitation, wind components.
+* Spatial resolution: ~9 km.
+* Temporal: daily, 2020–2025.
+* Format: NetCDF.
+
+### **2. ERA5 Single Levels Daily Statistics** (folder: `derived-era5-single-levels-daily-statistics`)
+
+* Additional meteorological variables.
+* Format: NetCDF.
+
+### **3. Sentinel‑2 NDVI** (folder: `sentinel2_ndvi`)
+
+* NDVI at 80 m resolution.
+* Quarterly data, 2020–2023.
+* Format: GeoTIFF.
+* Values stored in int8 → need a conversion.
+
+### **4. Sentinel‑3 OLCI NDVI** (folder: `sentinel3-olci-ndvi`)
+
+* Lower‑resolution NDVI.
+### **5. ECA Ground‑Station Temperature** (file: `ECA_blend_tx.zip`)
+
+* Point measurements of daily maximum temperature.
+* Very long time series (1851–2025).
+* Format: TXT files.
+
+### **6. Administrative Boundaries (Europe)** (files: `gadm_410_europe.gpkg`, `gadm_410.gpkg`)
+
+* Vector geographic boundaries.
+* Useful for mapping.
+
+### **7. Example notebooks**
+
+* `read-era5-netcdf_v0.ipynb`
+* `read-era5-netcdf_v1.ipynb`
+* `read-era5-netcdf_v2.ipynb`
+  These show how to open ERA5 files.
+
+### **8. User Guide Document**
+
+WIP document explaining data sources and formats.
+### Annexe
+file:///var/folders/st/2ck_cmfj69z7j1f1ht20838m0000gn/T/MicrosoftEdgeDownloads/67441c87-1198-441a-958e-120af6393225/brief_participants.pdf 
