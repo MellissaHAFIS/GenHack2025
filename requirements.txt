@@ -1,0 +1,8 @@
+numpy
+pandas
+xarray
+rasterio
+matplotlib
+seaborn
+geopandas
+# pip install -r requirements.txt

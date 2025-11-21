@@ -32,6 +32,11 @@ The goal is to:
 This week is the **Exploration & Warm‑up phase**.
 Focus: explore the provided data sources (ERA5, NDVI, and ground stations).
 Our objectives:
+- Load and explore all three datasets
+- Understand spatial/temporal coverage
+- Check data quality and formats
+- Identify your study area (choose a city with good ground station coverage)
+- Make initial correlations between NDVI, ERA5, and ground stations
 
 ### 1. **Load and inspect the datasets**
 
