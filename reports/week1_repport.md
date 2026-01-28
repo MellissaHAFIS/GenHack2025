@@ -1,4 +1,4 @@
-# GenHack 2025 - Week 1 Report: Data Exploration & Understanding
+# GenHack 2025 - Week 1 Report: Warm up
 
 ## Executive Summary
 

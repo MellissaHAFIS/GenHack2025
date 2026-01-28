@@ -1,306 +1,235 @@
-# Week 3 Report: Quantitative metrics to capture and analyze discrepancies between datasets.
-
-## Objective
-Assess the quality and accuracy of satellite temperature data (ERA5) by measuring how measurement uncertainty correlates with vegetation coverage across **Paris (France)**, **Rome (Italy)**, **Nantes (France)**, and **Perugia (Italy)** during summer 2022 (June - September).
-
-## Methodology
-
-### Data Sources
-We integrated three complementary datasets:
-
-1. **ERA5-Land Daily Temperature** (Satellite Data)
-   - Source: ERA5 
-   - Variable: 2m air temperature daily maximum
-   - Resolution: 0.1° × 0.1° (interpolated 10x to 0.01°)
-   - Period: June 1 - September 1, 2022
-   - Aggregation: Mean over summer season
-
-2. **Sentinel-2 NDVI** (Vegetation Index)
-   - Source: Copernicus Sentinel-2 satellite
-   - Variable: Normalized Difference Vegetation Index
-   - Resolution: 10-20m (resampled to match ERA5 grid)
-   - Range: -1.0 (no vegetation) to +1.0 (dense vegetation)
-
-3. **GADM** (Administrative Boundaries)
-   - Used to define study areas
-   - Buffer: 0.2° (~20km) around city center
-
-### Core Hypothesis
-**Satellite sensors have inherent measurement uncertainty that increases in non-vegetated areas.**
-
-- **In vegetated zones** (NDVI > 0.6): Satellites can reliably estimate temperature via spectral signatures of vegetation
-- **In urban/concrete zones** (NDVI < 0.2): Lack of vegetation makes spectral calibration difficult, leading to systematic bias
-
-### Mathematical Model
-
-We modeled ground-truth temperature as:
-
-```
-T_ground = T_satellite - (0.5 × (1 - NDVI))
-```
-
-Where:
-- `T_satellite` = Measured by ERA5
-- `(1 - NDVI)` = Urbanization factor (0 for dense veg, 1 for urban)
-- `0.5` = Maximum correction factor (°C) in fully urban areas
-
-This represents the satellite's inherent difficulty in non-vegetated areas.
-
-**Discrepancy** is then calculated as:
-```
-Δ T = T_satellite - T_ground = 0.5 × (1 - NDVI)
-```
-
-### Analysis Framework
-
-For each city, we:
-1. Extracted all 3,000-7,100 pixels within the study area
-2. Calculated satellite-ground truth discrepancy at each pixel
-3. Stratified pixels by urbanization level (based on NDVI)
-4. Computed correlation between discrepancy and vegetation density
-5. Generated statistical summaries and visualizations
+# Week 3 Presentation: Quantitative Metrics & Discrepancy Analysis
 
 ---
 
-## Results
+## Slide 1: Title & Research Focus
 
-### 1. Paris, France (Large Metropolis)
+**Week 3: Quantitative Metrics & Discrepancy Analysis**
+*From Visualization to Statistical Insight*
 
-#### Visual Analysis
-| Satellite vs Ground Truth | Discrepancy vs Vegetation |
-|:---:|:---:|
-| ![Scatter Paris](figures/week3_satellite_vs_ground_Paris.png) | ![Discrepancy Paris](figures/week3_discrepancy_vs_vegetation_Paris.png) |
+**Core Question:**
+*"Does Urban Heat Island explain ERA5 discrepancies with ground truth?"*
 
-| Discrepancy by Urbanization | Spatial Distribution |
-|:---:|:---:|
-| ![Boxplot Paris](figures/week3_discrepancy_boxplot_Paris.png) | ![Map Paris](figures/week3_discrepancy_map_Paris.png) |
+**Analysis Scope:**
+- 286 stations across 5 European cities
+- 2020-2023 period
+- Multi-variable statistical analysis
+- Machine learning feature importance
 
-#### Statistical Summary
-
-- **Pixels Analyzed:** 3,000
-- **Mean Satellite Temperature:** 25.90°C
-- **Mean Ground Truth Temperature:** 25.63°C
-- **Mean Discrepancy:** 0.27°C
-- **RMSE:** 0.28°C
-- **Maximum Discrepancy:** 0.48°C
-- **Standard Deviation:** 0.08°C
-- **Correlation (Sat vs Ground):** 0.9566 (very strong)
-- **Correlation (Discrepancy vs NDVI):** -1.0000 (perfect negative)
-
-#### Breakdown by Urbanization Level
-
-| Category | Mean Discrepancy | Pixels | NDVI |
-|:---|:---:|:---:|:---:|
-| **Urban/Concrete** | 0.42°C | 99 | 0.15 |
-| **Sparse Vegetation** | 0.34°C | 1,134 | 0.33 |
-| **Moderate Vegetation** | 0.26°C | 1,224 | 0.48 |
-| **Dense Vegetation** | 0.14°C | 543 | 0.73 |
-
-**Key Finding:** Satellite data in Paris shows a **tripling of error** from dense vegetation (0.14°C) to urban core (0.42°C). The 0.28°C difference represents significant measurement uncertainty in built-up areas.
+**Visual:** Overview map showing 5 cities (Berlin, Paris, Milano, Warszawa, Madrid)
 
 ---
 
-### 2. Rome (Roma), Italy (Large Metropolis)
+## Slide 2: The Surprising Finding - Vegetation Doesn't Explain Errors
 
-#### Visual Analysis
-| Satellite vs Ground Truth | Discrepancy vs Vegetation |
-|:---:|:---:|
-| ![Scatter Roma](figures/week3_satellite_vs_ground_Roma.png) | ![Discrepancy Roma](figures/week3_discrepancy_vs_vegetation_Roma.png) |
+**NDVI vs ERA5 Bias Analysis**
 
-| Discrepancy by Urbanization | Spatial Distribution |
-|:---:|:---:|
-| ![Boxplot Roma](figures/week3_discrepancy_boxplot_Roma.png) | ![Map Roma](figures/week3_discrepancy_map_Roma.png) |
+**Statistical Results:**
+- **ANOVA Test**: F=1.054, p=0.369
+- **Correlation**: r=0.042, p=0.480
+- **95% Confidence Intervals** overlap across all NDVI bins
 
-#### Statistical Summary
+**Error by Vegetation Density:**
+| NDVI Class | Bias (°C) | 95% CI | N Stations |
+|------------|-----------|---------|------------|
+| Very Low   | -1.630 ± 1.268 | [-2.17, -1.09] | 21 |
+| Low        | -1.133 ± 1.015 | [-1.35, -0.92] | 84 |
+| Medium     | -1.274 ± 1.242 | [-1.48, -1.07] | 147 |
+| High       | -1.235 ± 1.071 | [-1.60, -0.88] | 34 |
 
-- **Pixels Analyzed:** 7,119
-- **Mean Satellite Temperature:** 31.34°C
-- **Mean Ground Truth Temperature:** 31.08°C
-- **Mean Discrepancy:** 0.26°C
-- **RMSE:** 0.27°C
-- **Maximum Discrepancy:** 0.62°C
-- **Standard Deviation:** 0.09°C
-- **Correlation (Sat vs Ground):** 0.9971 (exceptional)
-- **Correlation (Discrepancy vs NDVI):** -1.0000 (perfect negative)
+**Key Insight**: ✗ **NO significant relationship** between vegetation density and ERA5 errors
 
-#### Breakdown by Urbanization Level
-
-| Category | Mean Discrepancy | Pixels | NDVI |
-|:---|:---:|:---:|:---:|
-| **Urban/Concrete** | 0.46°C | 187 | 0.08 |
-| **Sparse Vegetation** | 0.34°C | 2,466 | 0.32 |
-| **Moderate Vegetation** | 0.26°C | 2,573 | 0.48 |
-| **Dense Vegetation** | 0.14°C | 1,893 | 0.73 |
-
-**Key Finding:** Rome shows the **largest urban effect** of all cities. The historic center (highly urbanized with minimal vegetation) exhibits satellite errors up to **0.62°C**. The urban-to-rural discrepancy gradient is stark: **0.46°C - 0.14°C = 0.32°C difference**, suggesting Rome's dense concrete and stone structures create unique calibration challenges for satellite sensors.
+**Visual:** Box plots showing error distribution across NDVI classes
 
 ---
 
-### 3. Nantes, France (Medium City)
+## Slide 3: Urban vs Rural - No Significant Difference
 
-#### Visual Analysis
-| Satellite vs Ground Truth | Discrepancy vs Vegetation |
-|:---:|:---:|
-| ![Scatter Nantes](figures/week3_satellite_vs_ground_Nantes.png) | ![Discrepancy Nantes](figures/week3_discrepancy_vs_vegetation_Nantes.png) |
+**Urbanization Category Analysis**
 
-| Discrepancy by Urbanization | Spatial Distribution |
-|:---:|:---:|
-| ![Boxplot Nantes](figures/week3_discrepancy_boxplot_Nantes.png) | ![Map Nantes](figures/week3_discrepancy_map_Nantes.png) |
+**Error Statistics:**
+| Category | Bias (°C) | MAE (°C) | RMSE (°C) | N Stations |
+|----------|-----------|----------|-----------|------------|
+| Urban    | -1.141 ± 0.830 | 1.361 | 1.635 | 21 |
+| Suburban | -0.970 ± 1.441 | 1.722 | 2.017 | 22 |
+| Rural    | -1.290 ± 1.159 | 1.766 | 2.086 | 243 |
 
-#### Statistical Summary
+**Statistical Tests:**
+- Urban vs Rural: t=0.576, p=0.565
+- Urban vs Suburban: t=-0.473, p=0.639
+- All comparisons: **NOT SIGNIFICANT**
 
-- **Pixels Analyzed:** 3,000
-- **Mean Satellite Temperature:** 26.65°C
-- **Mean Ground Truth Temperature:** 26.41°C
-- **Mean Discrepancy:** 0.25°C
-- **RMSE:** 0.25°C
-- **Maximum Discrepancy:** 0.46°C
-- **Standard Deviation:** 0.06°C
-- **Correlation (Sat vs Ground):** 0.9770 (excellent)
-- **Correlation (Discrepancy vs NDVI):** -1.0000 (perfect negative)
+**Key Insight**: ✗ **Urbanization category alone doesn't predict ERA5 errors**
 
-#### Breakdown by Urbanization Level
-
-| Category | Mean Discrepancy | Pixels | NDVI |
-|:---|:---:|:---:|:---:|
-| **Urban/Concrete** | 0.42°C | 34 | 0.16 |
-| **Sparse Vegetation** | 0.33°C | 432 | 0.34 |
-| **Moderate Vegetation** | 0.25°C | 1,988 | 0.50 |
-| **Dense Vegetation** | 0.17°C | 546 | 0.66 |
-
-**Key Finding:** Nantes, being a medium-sized city with more distributed green space, shows the **lowest standard deviation of discrepancy (0.06°C)**. This suggests more homogeneous satellite performance across the city. Urban errors (0.42°C) are comparable to larger cities, but the prevalence of moderate vegetation (66% of pixels) dampens overall uncertainty.
+**Visual:** Violin plots showing error distributions by urbanization category
 
 ---
 
-### 4. Perugia, Italy (Medium Inland City)
+## Slide 4: Seasonal Patterns Matter Most
 
-#### Visual Analysis
-| Satellite vs Ground Truth | Discrepancy vs Vegetation |
-|:---:|:---:|
-| ![Scatter Perugia](figures/week3_satellite_vs_ground_Perugia.png) | ![Discrepancy Perugia](figures/week3_discrepancy_vs_vegetation_Perugia.png) |
+**Strong Seasonal Variation in Errors**
 
-| Discrepancy by Urbanization | Spatial Distribution |
-|:---:|:---:|
-| ![Boxplot Perugia](figures/week3_discrepancy_boxplot_Perugia.png) | ![Map Perugia](figures/week3_discrepancy_map_Perugia.png) |
+**Seasonal Bias Pattern:**
+- **Winter**: -0.780 ± 1.196°C
+- **Spring**: -1.394 ± 1.252°C  
+- **Summer**: -1.689 ± 1.327°C
+- **Fall**: -1.005 ± 1.139°C
 
-#### Statistical Summary
+**Statistical Significance:**
+- **ANOVA**: F=30.58, p<0.000001
+- **Highly significant** seasonal variation
 
-- **Pixels Analyzed:** 5,600
-- **Mean Satellite Temperature:** 30.45°C
-- **Mean Ground Truth Temperature:** 30.22°C
-- **Mean Discrepancy:** 0.23°C
-- **RMSE:** 0.26°C
-- **Maximum Discrepancy:** 0.71°C ← Highest across all cities
-- **Standard Deviation:** 0.11°C ← Highest variability
-- **Correlation (Sat vs Ground):** 0.9916 (excellent)
-- **Correlation (Discrepancy vs NDVI):** -1.0000 (perfect negative)
+**Multiplicative Effect:**
+- Correlation(Bias, Temperature): r=-0.329, p<0.000001
+- **Error scales with temperature** - larger cold bias in warmer conditions
 
-#### Breakdown by Urbanization Level
-
-| Category | Mean Discrepancy | Pixels | NDVI |
-|:---|:---:|:---:|:---:|
-| **Urban/Concrete** | 0.63°C | 191 | -0.26 |
-| **Sparse Vegetation** | 0.33°C | 1,174 | 0.34 |
-| **Moderate Vegetation** | 0.25°C | 1,725 | 0.50 |
-| **Dense Vegetation** | 0.14°C | 2,510 | 0.72 |
-
-**Key Finding:** Perugia exhibits the **most extreme urban discrepancy (0.63°C)** despite being the smallest city. This is likely due to:
-1. **Hilltop topography** → concentrated urban core with minimal surrounding vegetation within the buffer zone
-2. **Historic stone architecture** → poor spectral calibration for satellite sensors
-3. **Steeper gradients** → rapid transition from dense urban to vegetated slopes creates higher variability (Std Dev = 0.11°C)
-
-Notably, 45% of Perugia's pixels are dense vegetation, yet the urban areas still show the highest errors.
+**Visual:** Seasonal error bar charts with confidence intervals
 
 ---
 
-## Comparative Analysis
+## Slide 5: Geographic Variation - City-Level Differences
 
-### Summary Table
+**Significant Cross-City Variation**
 
-| City | Size | Pixels | Mean Discrepancy | RMSE | Max Discrepancy | Urban Error | Dense Veg Error | Gradient |
-|:---|:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| **Paris** | Large | 3,000 | 0.27°C | 0.28°C | 0.48°C | 0.42°C | 0.14°C | 0.28°C |
-| **Roma** | Large | 7,119 | 0.26°C | 0.27°C | 0.62°C | 0.46°C | 0.14°C | 0.32°C |
-| **Nantes** | Medium | 3,000 | 0.25°C | 0.25°C | 0.46°C | 0.42°C | 0.17°C | 0.25°C |
-| **Perugia** | Medium | 5,600 | 0.23°C | 0.26°C | 0.71°C | 0.63°C | 0.14°C | 0.49°C |
+**City Performance:**
+| City | Bias (°C) | RMSE (°C) | Elevation (m) | N Stations |
+|------|-----------|-----------|---------------|------------|
+| Berlin | -0.982 ± 0.201 | 1.490 | 65 | 86 |
+| Madrid | -1.299 ± 1.200 | 2.097 | 888 | 87 |
+| Milano | -1.590 ± 1.640 | 2.674 | 510 | 88 |
+| Paris | -1.018 ± 0.317 | 1.589 | 103 | 5 |
+| Warszawa | -0.809 ± 0.347 | 1.588 | 135 | 20 |
 
-### Key Insights
+**Statistical Test:**
+- **ANOVA**: F=3.993, p=0.0036
+- **Significant differences** between cities
 
-#### 1. **Universal Vegetation Effect**
-All four cities demonstrate a **perfect negative correlation (-1.0)** between discrepancy and vegetation density. This is not coincidence—it reflects a fundamental physical principle:
-
-- **Vegetated pixels** have consistent spectral signatures that allow accurate temperature retrieval
-- **Urban pixels** lack stable references, forcing satellites to interpolate or estimate, introducing bias
-
-#### 2. **Urban Error Magnitude**
-Urban/concrete zones consistently show **0.42-0.63°C errors**:
-- Rome (0.46°C) and Paris (0.42°C): High density urban cores
-- Nantes (0.42°C): Despite smaller size, still 0.42°C
-- Perugia (0.63°C): Extreme due to topography + historic core concentration
-
-**Implication:** For any city analysis using satellite data, assume 0.4-0.6°C systematic warm bias in urban centers.
-
-#### 3. **Vegetation as Data Quality Proxy**
-Dense vegetation zones reduce error to **0.14-0.17°C** uniformly across all cities. This suggests:
-- Vegetation coverage is the dominant control on satellite accuracy
-- City size, latitude, or specific urban morphology matter less than local greenery
-
-#### 4. **Gradient Severity**
-The urban-to-rural error gradient (Urban - Dense Veg) ranges from **0.25°C to 0.49°C**:
-- **Nantes (0.25°C):** Smoothest gradient → distributed green space
-- **Perugia (0.49°C):** Steepest gradient → concentrated urban core + topographic effects
-
-**Implication:** Smaller, greener cities show more stable satellite performance. Concentrated historic cores on hills amplify uncertainty.
+**Visual:** City comparison bar charts with error bars
 
 ---
 
-## Conclusions
+## Slide 6: The UHI Representation Problem
 
-1. **Satellite temperature data has vegetation-dependent accuracy**
-   - Perfect negative correlation (-1.0) between error and vegetation density
-   - This relationship is consistent across European cities of different sizes
+**ERA5 Underestimates Urban Heat Island**
 
-2. **Urban areas are systematic warm-biased**
-   - Satellites overestimate by 0.4-0.6°C in concrete-dominated zones
-   - This bias dominates in historic city centers and topographically concentrated cities
+**UHI Discrepancy Analysis:**
+| City | Observed UHI | ERA5 UHI | Discrepancy |
+|------|--------------|----------|-------------|
+| Berlin | +0.103°C | +0.129°C | +0.025°C |
+| Warszawa | +0.791°C | +0.507°C | -0.283°C |
+| Madrid | -1.335°C | -4.686°C | -3.351°C |
 
-3. **Vegetation coverage is a proxy for satellite data quality**
-   - Dense green zones (NDVI > 0.6) → reliable satellite data (0.14-0.17°C error)
-   - Urban zones (NDVI < 0.2) → significant satellite bias (0.42-0.63°C error)
-   - Gradient severity depends on urban morphology
+**Key Findings:**
+- **Mean UHI Discrepancy**: -1.203°C
+- **ERA5 systematically underestimates** UHI intensity
+- **Madrid shows extreme discrepancy** (-3.35°C)
 
-4. **Urban greening improves data quality**
-   - Not only does vegetation cool cities (Week 2 finding)
-   - It also makes satellite measurements more accurate (Week 3 finding)
-   - Dual benefit: thermal comfort + observability
+**Interpretation**: ERA5's coarse resolution smooths out urban temperature peaks
 
-5. **Recommendation for practitioners**
-   - Use satellite data with vegetation-dependent confidence intervals
-   - In urban cores, supplement with ground-truth stations
-   - For urban climate studies, integrate both satellite + in-situ observations
+**Visual:** UHI comparison scatter plot (Observed vs ERA5)
 
 ---
 
-## Technical Notes
+## Slide 7: Machine Learning Reveals True Drivers
 
-### Data Considerations
-- All analysis based on summer 2022 (June-September), peak warm season
-- Results may differ for winter or shoulder seasons
-- Tested on 4 European cities; generalization to other regions requires validation
-- ERA5 resolution (0.1°) may smooth local hot spots; finer satellite data would reveal greater variability
+**Random Forest Feature Importance**
+
+**Top Predictors of ERA5 Bias:**
+1. **Elevation** (29.7%) - Most important
+2. **Mean Temperature** (23.3%) - Confirms multiplicative effect
+3. **Latitude** (16.8%) - Geographic factor
+4. **Distance to Coast** (8.6%) - Maritime influence
+5. **Distance to City** (8.0%) - Urbanization proxy
+6. **NDVI** (7.8%) - Vegetation (low importance)
+7. **Longitude** (5.9%) - Geographic factor
+
+**Model Performance:**
+- **R² = 0.235** - Explains 23.5% of error variance
+- **Cross-validation consistent**
+
+**Key Insight**: Elevation and temperature are better predictors than urbanization
+
+**Visual:** Feature importance bar chart
 
 ---
 
-## Appendix: Summary Statistics Table
+## Slide 8: Statistical Significance Summary
 
-| Metric | Paris | Roma | Nantes | Perugia |
-|:---|:---:|:---:|:---:|:---:|
-| Pixels | 3,000 | 7,119 | 3,000 | 5,600 |
-| Mean Discrepancy (°C) | 0.27 | 0.26 | 0.25 | 0.23 |
-| RMSE (°C) | 0.28 | 0.27 | 0.25 | 0.26 |
-| Max Discrepancy (°C) | 0.48 | 0.62 | 0.46 | 0.71 |
-| Std Dev (°C) | 0.08 | 0.09 | 0.06 | 0.11 |
-| Correlation Sat-Ground | 0.957 | 0.997 | 0.977 | 0.992 |
-| Urban/Concrete Error (°C) | 0.42 | 0.46 | 0.42 | 0.63 |
-| Dense Vegetation Error (°C) | 0.14 | 0.14 | 0.17 | 0.14 |
-| Error Gradient (°C) | 0.28 | 0.32 | 0.25 | 0.49 |
+**Correlation Analysis with ERA5 Bias**
+
+**Significant Correlations:**
+- ✓ **Mean Temperature**: r=-0.329, p<0.000001 (***)
+- ✓ **Latitude**: r=+0.162, p=0.006 (**)
+- ✓ **Distance to Coast**: r=-0.161, p=0.006 (**)
+- ✓ **Distance to City**: r=-0.121, p=0.041 (*)
+
+**Non-Significant Correlations:**
+- ✗ **NDVI**: r=+0.042, p=0.480
+- ✗ **Elevation**: r=+0.024, p=0.689
+- ✗ **Longitude**: r=+0.082, p=0.165
+
+**Key Insight**: Atmospheric and geographic factors matter more than surface characteristics
+
+**Visual:** Correlation matrix heatmap
+
+---
+
+## Slide 9: Overall ERA5 Performance Metrics
+
+**Comprehensive Accuracy Assessment**
+
+**Overall Statistics:**
+- **Mean Bias**: -1.254 ± 1.162°C
+- **RMSE**: 2.048°C
+- **MAE**: 1.733°C
+- **Correlation**: 0.9876
+
+**Error Distribution:**
+- Small errors (<1°C): 39.9% of stations
+- Medium errors (1-2°C): 42.7% of stations  
+- Large errors (≥2°C): 17.5% of stations
+
+**Systematic Pattern:**
+- **Consistent cold bias** across all conditions
+- **Multiplicative scaling** with temperature
+- **Seasonal dependence** strongest factor
+
+**Visual:** Error distribution histogram with percentiles
+
+---
+
+## Slide 10: Key Insights & Week 4 Implications
+
+**Three Major Findings:**
+
+1. **✗ Vegetation Doesn't Explain Errors**
+   - No significant NDVI-bias relationship
+   - Challenges initial hypothesis
+
+2. **✓ Season & Geography Matter Most**
+   - Strong seasonal patterns (p<0.000001)
+   - Significant city-level variation (p=0.0036)
+   - Elevation is top predictor (29.7% importance)
+
+3. **⚠️ ERA5 Underestimates UHI**
+   - Mean discrepancy: -1.203°C
+   - Systematic smoothing of urban peaks
+
+**Week 4 Modeling Implications:**
+- Focus on **seasonal correction models**
+- Incorporate **elevation and temperature scaling**
+- Develop **city-specific bias corrections**
+- Move beyond vegetation-based explanations
+
+**Visual:** Summary dashboard highlighting key metrics
+
+---
+
+## Presentation Delivery Notes
+
+### Key Numbers to Emphasize:
+- **p=0.369** - NDVI non-significance
+- **p<0.000001** - Seasonal significance  
+- **29.7%** - Elevation feature importance
+- **-1.203°C** - UHI underestimation
+- **0.9876** - Overall correlation excellence
