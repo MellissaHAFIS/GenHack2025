@@ -36,7 +36,14 @@ The goal is to:
 * Provide insights that can help cities better understand and mitigate UHI.
 
 # Checkout my work in these files:
+Notebooks/ 
 * week1_team19.ipynb
 * week2_team19.ipynb
 * week3_team19.ipynb
 * week4_team19.ipynb
+
+Slides/
+* week1_team19.pdf
+* week2_team19.pdf
+* week3_team19.pdf
+* week4_team19.pdf
