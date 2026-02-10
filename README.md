@@ -34,3 +34,9 @@ The goal is to:
 * Study how **vegetation (NDVI)** affects temperature discrepancies.
 * Build visualizations, metrics, and simple explanatory models.
 * Provide insights that can help cities better understand and mitigate UHI.
+
+# Checkout my work in these files:
+* week1_team19.ipynb
+* week2_team19.ipynb
+* week3_team19.ipynb
+* week4_team19.ipynb
