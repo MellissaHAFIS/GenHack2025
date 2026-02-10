@@ -1,4 +1,8 @@
 # GenHack 2025 – Urban Heat Island Analysis
+# 🏆UrbanCoolers (team 19) - 1st winner
+Overall Winner and Winner of the Best Understanding of the Challenges prize
+https://www.polytechnique.edu/en/genhack-4-hackathon-generative-modelling 
+
 ## Urban Coolers – École Polytechnique Hackathon (Nov–Dec 2025)
 
 This repository contains our work for GenHack 2025, a four-week hackathon focused on analyzing and explaining the Urban Heat Island (UHI) effect using:
